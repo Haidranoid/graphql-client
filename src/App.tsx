@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from 'react';
+
+const GRAPHQL_URL = 'http://localhost:9000/'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState({greeting: ''})
+
+    useEffect(() => {
+        fetchGreeting();
+    },[])
+
+    const fetchGreeting = async () => {
+        const response = await fetch(GRAPHQL_URL, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: `
+                    query {
+                        greeting
+                    }
+                `
+            })
+        })
+
+        const {data} = await response.json();
+        setData(data);
+        setLoading(false)
+        console.log(data)
+    }
+
+    return (
+        <div>
+            {loading ? 'loading..' : data.greeting}
+        </div>
+    );
 }
 
 export default App;
